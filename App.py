@@ -18,13 +18,16 @@ import csv
 import pandas as pd
 
 driver = webdriver.Chrome(executable_path='chromedriver.exe')
-driver.get('https://shopee.co.id/search?facet=14783%2C157&keyword=shake&labelIds=1000006&maxPrice=247000&minPrice=230000&noCorrection=true&page=0')
-timeout = 20
+driver.get('https://shopee.co.id/search?facet=14785%2C157%2C14784&keyword=shake&maxPrice=280000&minPrice=230000&noCorrection=true&page=0')
+
 
 toko = []
-            
+nomor_toko = 0            
             
 def ProcessToko():
+    print("Memproses Toko")
+    global nomor_toko
+    nomor_toko += 1
     global numberpage
     global toko
     global nama_toko
@@ -60,7 +63,7 @@ def ProcessToko():
         print("step 4")    
         click_rating.click()
         
-        for ratingto in range(1):
+        for ratingto in range(5):
             param1 = ""
             print("IM NUMBAH STAR",ratingto)
             #filter rating 1 ~ 3
@@ -119,6 +122,7 @@ def ProcessToko():
 #get max page
 
 def InputData():
+    global nomor_toko
     global trigger1
     global numberpage
     global nama_toko
@@ -142,7 +146,7 @@ def InputData():
             pass
     print(data_feedback)
     with open('new_data.csv','a',encoding="UTF-8",newline='') as f:
-        header_data = ['nama_toko','rating','name','feedback','feedback_awto','user_image','produk','product link','tanggal_komen']
+        header_data = ['nomor_toko','nama_toko','rating','name','feedback','feedback_awto','user_image','produk','product link','tanggal_komen']
         writer = csv.DictWriter(f, fieldnames=header_data)
         try:
             if not(trigger1):
@@ -201,7 +205,7 @@ def InputData():
             except:
                 TangKom = ''
             #header_data = ['rating','name','feedback','feedback_awto','user_image','produk','product link']    
-            writer.writerow({header_data[0]:nama_toko,header_data[1]:rating,header_data[2]:nama_responder,header_data[3]:feedback,header_data[4]:awto_feedback,header_data[5]:user_image,header_data[6]:nama_produk,header_data[7]:link_produk,header_data[8]:TangKom})
+            writer.writerow({header_data[0]:nomor_toko,header_data[1]:nama_toko,header_data[2]:rating,header_data[3]:nama_responder,header_data[4]:feedback,header_data[5]:awto_feedback,header_data[6]:user_image,header_data[7]:nama_produk,header_data[8]:link_produk,header_data[9]:TangKom})
 
           
 get_page = None
@@ -210,7 +214,7 @@ while get_page is None:
         get_page = driver.find_elements_by_class_name("shopee-mini-page-controller__total")[0].text
     except:
         pass
-            
+print(get_page)            
 for i in range(int(get_page)):
     get_current = None
     while get_current is None:
@@ -228,13 +232,27 @@ for i in range(int(get_page)):
             sleep(0.5)
             
     elements = None
-    while elements is None:
+     while elements is None:
         try:
+            elements = "NOW"
+            print("this is element now",elements)
             elements = driver.find_elements_by_css_selector(".shopee-search-item-result__item")
+            print("trying to get elements")
         except:
             print("error when getting contents")
+
+    while len(elements) <= 1:
+        try:
+            elements = "NOW2"
+            print("this is element now2",elements)
+            elements = driver.find_elements_by_css_selector(".shopee-search-item-result__item")
+            print("trying to get elements2")
+        except:
+            print("error when getting contents2")
+            
     print(elements)
     for y in elements:
+        print("AM I WORKING NOW?")
         ActionChains(driver).key_down(Keys.CONTROL).click(y).key_up(Keys.CONTROL).perform()
         #time.sleep(1)
         driver.switch_to_window(driver.window_handles[1])
@@ -246,7 +264,9 @@ for i in range(int(get_page)):
     while Page_Butt is None:
         try:
             Page_Butt = driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div[3]/div[2]/div/div[1]/div[2]/button[2]')
+            print("trying to get current page button")
         except:
             pass
+    print("\n\n",Page_Butt,"\n\n")
     Page_Butt.click()
     
